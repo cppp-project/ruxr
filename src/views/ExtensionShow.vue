@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-if="!notFound">
     <ErrorContainer :initFunction="init">
       <div class="main-content">
         <div class="sidebar">
@@ -10,7 +10,7 @@
             <LiteLoadingBar v-else />
 
             <span class="package-version" v-if="packageData">
-              v{{ packageData.versions[0].version }}
+              v{{ packageData.versions[0]?.version || FALLBACK_VERSION }}
             </span>
             <LiteLoadingBar v-else />
 
@@ -33,13 +33,29 @@
                 }}</code>
                 <button
                   class="copy-command-btn"
-                  :class="{ copied: isCopied }"
+                  :class="{
+                    copied: copyStatus === COPY_SUCCESS,
+                    copied_failure: copyStatus === COPY_FAILURE,
+                  }"
                   @click="copyInstallCommand"
                   title="Copy to clipboard"
                 >
-                  <i class="nf nf-md-content_copy" v-if="!isCopied"></i>
-                  <i class="nf nf-md-check" v-else></i>
-                  <span class="copy-text">{{ isCopied ? "Copied!" : "" }}</span>
+                  <i
+                    class="nf nf-md-check"
+                    v-if="copyStatus === COPY_SUCCESS"
+                  ></i>
+                  <i
+                    class="nf nf-cod-error_small"
+                    v-else-if="copyStatus === COPY_FAILURE"
+                  ></i>
+                  <i class="nf nf-md-content_copy" v-else></i>
+                  <span class="copy-text">{{
+                    copyStatus === COPY_SUCCESS
+                      ? "Copied!"
+                      : copyStatus === COPY_FAILURE
+                      ? "Copy failed"
+                      : ""
+                  }}</span>
                 </button>
               </div>
             </div>
@@ -107,121 +123,155 @@
         </div>
 
         <div class="content-area">
-          <div class="tabs">
+          <div class="tabs" ref="tabsContainer">
             <div
+              ref="readmeTab"
               class="tab"
               :class="{ active: activeTab === 'readme' }"
-              @click="activeTab = 'readme'"
+              @click="switchTab('readme')"
             >
               README
             </div>
             <div
+              ref="versionsTab"
               class="tab"
               :class="{ active: activeTab === 'versions' }"
-              @click="activeTab = 'versions'"
+              @click="switchTab('versions')"
             >
               Versions
             </div>
             <div
+              ref="licenseTab"
               class="tab"
               :class="{ active: activeTab === 'license' }"
-              @click="activeTab = 'license'"
+              @click="switchTab('license')"
             >
               License
             </div>
             <div
+              ref="dependenciesTab"
               class="tab"
               :class="{ active: activeTab === 'dependencies' }"
-              @click="activeTab = 'dependencies'"
+              @click="switchTab('dependencies')"
             >
               Dependencies
             </div>
+            <div class="tab-indicator" :style="indicatorStyle"></div>
           </div>
 
           <div class="tab-content">
-            <div v-if="activeTab === 'readme'" class="readme-content">
-              <MarkdownViewer
-                :url="packageData.getReadmeUrl()"
-                v-if="packageData"
-              />
-              <LoadingBar v-else />
-            </div>
+            <Transition name="fade" mode="out-in">
+              <div
+                v-if="activeTab === 'readme'"
+                key="readme"
+                class="readme-content"
+              >
+                <MarkdownViewer
+                  :url="baseUrl + packageData.getReadmeUrl()"
+                  v-if="packageData"
+                />
+                <LoadingBar v-else />
+              </div>
 
-            <div v-if="activeTab === 'versions'" class="versions-content">
-              <h3>Version History</h3>
-              <ul class="versions-list">
-                <div v-if="packageData">
-                  <li
-                    v-for="version in packageData.versions"
-                    :key="version.version"
-                    class="version-item"
-                  >
-                    <span>
-                      <a
-                        :href="version.url"
-                        target="_blank"
-                        class="version-number"
-                        v-if="version.url"
-                        >v{{ version.version }}</a
-                      >
-                      <div v-else>{{ version.version }}</div>
-                    </span>
-                    <span class="version-date">{{ version.date }}</span>
-                  </li>
-                </div>
-                <LoadingBar v-else-if="!packageData" />
-                <div v-else class="no-content">
-                  <p>No version history available for this extension.</p>
-                </div>
-              </ul>
-            </div>
+              <div
+                v-else-if="activeTab === 'versions'"
+                key="versions"
+                class="versions-content"
+              >
+                <h3>Version History</h3>
+                <ul class="versions-list">
+                  <div v-if="packageData">
+                    <li
+                      v-for="version in packageData.versions"
+                      :key="version.version"
+                      class="version-item"
+                    >
+                      <span>
+                        <a
+                          :href="version.url"
+                          target="_blank"
+                          class="version-number"
+                          v-if="version.url"
+                          >v{{ version.version }}</a
+                        >
+                        <div v-else>{{ version.version }}</div>
+                      </span>
+                      <span class="version-date">{{ version.date }}</span>
+                    </li>
+                    <div v-if="!packageData.versions.length" class="no-content">
+                      <p>No version history available for this extension.</p>
+                    </div>
+                  </div>
+                  <LoadingBar v-else />
+                </ul>
+              </div>
 
-            <div v-if="activeTab === 'license'" class="license-content">
-              <ErrorContainer :initFunction="fetchLicense">
-                <div v-if="packageData && licenseText" class="markdown-body"
-                :key="licenseText">
-                  <h1>{{ packageData.license }}</h1>
-                  <pre><code>{{ licenseText }}</code></pre>
-                </div>
-                <LoadingBar v-else/>
-              </ErrorContainer>
-            </div>
+              <div
+                v-else-if="activeTab === 'license'"
+                key="license"
+                class="license-content"
+              >
+                <ErrorContainer :initFunction="fetchLicense">
+                  <LicenseViewer
+                    v-if="packageData && licenseText"
+                    :key="licenseText"
+                    :licenseName="packageData.license"
+                    :licenseSummary="[]"
+                    :licenseContent="licenseText"
+                  />
+                  <!-- <h1>{{ packageData.license }}</h1>
+                    <pre><code>{{ licenseText }}</code></pre>
+                  </div> -->
+                  <LoadingBar v-else />
+                </ErrorContainer>
+              </div>
 
-            <div
-              v-if="activeTab === 'dependencies'"
-              class="dependencies-content"
-            >
-              <ul class="versions-list">
-                <div v-if="packageData && packageData.deps.length">
-                  <li
-                    class="version-item"
-                    v-for="dep in packageData.deps"
-                    :key="dep.name"
-                  >
-                    <span>
-                      <a
-                        :href="dep.url"
-                        target="_blank"
-                        class="metadata-link"
-                        v-if="dep.url"
-                      >
-                        {{ dep.name }}
-                      </a>
-                      <div v-else>{{ dep.name }}</div>
-                    </span>
-                    <span>{{ dep.version }}</span>
-                  </li>
-                </div>
-                <LoadingBar v-else-if="!packageData" />
-                <div v-else class="no-content">
-                  <p>No dependencies required for this extension.</p>
-                </div>
-              </ul>
-            </div>
+              <div
+                v-else-if="activeTab === 'dependencies'"
+                key="dependencies"
+                class="dependencies-content"
+              >
+                <h3>Dependencies</h3>
+                <ul class="versions-list">
+                  <div v-if="packageData && packageData.deps.length">
+                    <li
+                      class="version-item"
+                      v-for="dep in packageData.deps"
+                      :key="dep.name"
+                    >
+                      <span>
+                        <img
+                          :src="getDepSectionIcon(dep.section)"
+                          alt="Icon"
+                          class="dep-section-icon"
+                        />
+                        <a
+                          :href="dep.url"
+                          target="_blank"
+                          class="metadata-link"
+                          v-if="dep.url"
+                        >
+                          {{ dep.name }}
+                        </a>
+                        <div v-else>{{ dep.name }}</div>
+                      </span>
+                      <span>{{ dep.version }}</span>
+                    </li>
+                  </div>
+                  <LoadingBar v-else-if="!packageData" />
+                  <div v-else class="no-content">
+                    <p>No dependencies required for this extension.</p>
+                  </div>
+                </ul>
+              </div>
+            </Transition>
           </div>
         </div>
       </div>
     </ErrorContainer>
+  </div>
+  <div v-else>
+    <NotFound />
   </div>
 </template>
 
@@ -230,13 +280,17 @@ import { Options, Vue } from "vue-class-component";
 
 import { FullExtensionInfo } from "@/lib/extension";
 import { fetchExtensionInfo } from "@/lib/fetch";
+import { getDepSectionIcon } from "@/lib/dep-section";
+import { useRoute } from "vue-router";
+
 import DOMPurify from "dompurify";
 
 import LoadingBar from "@/components/LoadingBar.vue";
 import LiteLoadingBar from "@/components/LiteLoadingBar.vue";
 import MarkdownViewer from "@/components/MarkdownViewer.vue";
 import ErrorContainer from "@/components/ErrorContainer.vue";
-import { useRoute } from "vue-router";
+import LicenseViewer from "@/components/LicenseViewer.vue";
+import NotFound from "./NotFound.vue";
 
 @Options({
   name: "ExtensionShow",
@@ -245,27 +299,77 @@ import { useRoute } from "vue-router";
     LiteLoadingBar,
     MarkdownViewer,
     ErrorContainer,
+    LicenseViewer,
+    NotFound,
   },
 })
-export default class ExtensionShow extends Vue {
+class ExtensionShow extends Vue {
+  readonly COPY_NOT_YET = -1;
+  readonly COPY_SUCCESS = 0;
+  readonly COPY_FAILURE = 1;
+
   activeTab: string = "readme";
   packageData: FullExtensionInfo | null = null;
-  isCopied: boolean = false;
+  copyStatus: number = this.COPY_NOT_YET;
+  indicatorStyle: Record<string, string> = {};
+
+  readonly FALLBACK_VERSION: string = "N/A";
 
   rubiscoExtInstallCommand: string = "";
   readmeText?: string;
   licenseText: string = "";
+  baseUrl: string = process.env.BASE_URL;
+  notFound: boolean = false;
+
+  getDepSectionIcon = (section: string | null): string =>
+    getDepSectionIcon(this.baseUrl, section);
 
   async init() {
     const route = useRoute();
     const id = route.params.id as string;
-    this.packageData = await fetchExtensionInfo(id);
+    this.packageData = await fetchExtensionInfo(this.baseUrl, id);
+    if (!this.packageData) {
+      // Extension not found
+      this.notFound = true;
+      return;
+    }
     document.title = `${this.packageData.name} - RUXR`;
     this.rubiscoExtInstallCommand = `rubisco ext install ${this.packageData.id}`;
+
+    this.$nextTick(() => {
+      this.updateIndicator(this.activeTab);
+    });
+  }
+
+  mounted() {
+    this.$nextTick(() => {
+      this.updateIndicator(this.activeTab);
+    });
+  }
+
+  switchTab(tab: string) {
+    this.activeTab = tab;
+    this.updateIndicator(tab);
+  }
+
+  updateIndicator(tab: string) {
+    const tabRef = this.$refs[`${tab}Tab`] as HTMLElement;
+    if (tabRef) {
+      const { offsetLeft, offsetWidth } = tabRef;
+      this.indicatorStyle = {
+        transform: `translateX(${offsetLeft}px)`,
+        width: `${offsetWidth}px`,
+      };
+    }
   }
 
   async fetchLicense() {
-    const response = await fetch(this.packageData!.getLicenseUrl());
+    if (!this.packageData) {
+      throw new Error("Package data is not available");
+    }
+    const response = await fetch(
+      this.baseUrl + this.packageData.getLicenseUrl()
+    );
     if (!response.ok) {
       throw new Error(`Failed to fetch license: ${response.statusText}`);
     }
@@ -276,17 +380,54 @@ export default class ExtensionShow extends Vue {
     if (!this.packageData) return;
 
     try {
-      await navigator.clipboard.writeText(this.rubiscoExtInstallCommand);
-      this.isCopied = true;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(this.rubiscoExtInstallCommand);
+        this.copyStatus = this.COPY_SUCCESS;
 
-      setTimeout(() => {
-        this.isCopied = false;
-      }, 2000);
+        setTimeout(() => {
+          this.copyStatus = this.COPY_NOT_YET;
+        }, 2000);
 
-      console.log("Install command copied to clipboard");
+        console.log("Install command copied to clipboard");
+      } else {
+        this.fallbackCopyToClipboard(this.rubiscoExtInstallCommand);
+      }
     } catch (error) {
       console.error("Failed to copy to clipboard:", error);
-      this.selectCommandText();
+      this.fallbackCopyToClipboard(this.rubiscoExtInstallCommand);
+    }
+  }
+
+  fallbackCopyToClipboard(text: string): void {
+    // Create a temporary textarea element.
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    textArea.style.top = "-999999px";
+    document.body.appendChild(textArea);
+
+    textArea.focus();
+    textArea.select();
+
+    try {
+      // See: https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
+      // @ts-ignore - execCommand is deprecated but still supported.
+      const successful = document.execCommand("copy");
+      if (successful) {
+        this.copyStatus = this.COPY_SUCCESS;
+        setTimeout(() => {
+          this.copyStatus = this.COPY_NOT_YET;
+        }, 2000);
+        console.log("Install command copied to clipboard (fallback method)");
+      } else {
+        console.error("Failed to copy using fallback method");
+      }
+    } catch (err) {
+      console.error("Fallback copy failed:", err);
+      this.copyStatus = this.COPY_FAILURE;
+    } finally {
+      document.body.removeChild(textArea);
     }
   }
 
@@ -313,7 +454,13 @@ export default class ExtensionShow extends Vue {
     a.click();
     document.body.removeChild(a);
   }
+
+  beforeUnmount() {
+    this.copyStatus = this.COPY_NOT_YET;
+  }
 }
+
+export default ExtensionShow;
 </script>
 
 <style scoped>
@@ -354,7 +501,7 @@ export default class ExtensionShow extends Vue {
 }
 
 .package-description {
-  color: #555;
+  color: var(--hint);
   margin-bottom: 20px;
 }
 
@@ -377,7 +524,7 @@ export default class ExtensionShow extends Vue {
 .metadata-label {
   font-weight: bold;
   min-width: 100px;
-  color: #555;
+  color: var(--hint);
 }
 
 .metadata-link {
@@ -397,17 +544,17 @@ export default class ExtensionShow extends Vue {
   gap: 8px;
   padding: 8px;
   margin-bottom: 6px;
-  background: #f8f9fa;
+  background: var(--secondary-light);
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border);
   transition: all 0.2s ease;
   text-decoration: none;
 }
 
 .maintainer-card:hover {
-  background: #e9ecef;
+  background: var(--secondary-light-hover);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px var(--shadow);
 }
 
 .maintainer-avatar {
@@ -418,7 +565,7 @@ export default class ExtensionShow extends Vue {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2px solid #dee2e6;
+  border: 2px solid var(--border-hover);
   transition: border-color 0.2s ease;
 }
 
@@ -450,7 +597,7 @@ export default class ExtensionShow extends Vue {
 }
 
 .tag {
-  background: var(--secondary);
+  background: var(--secondary-light);
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 0.85rem;
@@ -476,7 +623,7 @@ export default class ExtensionShow extends Vue {
 
 .btn-primary {
   background: var(--primary);
-  color: white;
+  color: var(--light);
   flex: 1;
 }
 
@@ -494,8 +641,8 @@ export default class ExtensionShow extends Vue {
 .command-box {
   display: flex;
   align-items: center;
-  background-color: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background-color: var(--secondary-light);
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 12px;
   position: relative;
@@ -514,7 +661,7 @@ export default class ExtensionShow extends Vue {
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
-  color: #6c757d;
+  color: var(--hint);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -524,13 +671,18 @@ export default class ExtensionShow extends Vue {
 }
 
 .copy-command-btn:hover {
-  background-color: #e9ecef;
+  background-color: var(--secondary-light-hover);
   color: var(--primary);
 }
 
 .copy-command-btn.copied {
-  color: #28a745;
-  background-color: #d4edda;
+  color: var(--success);
+  background-color: var(--success-background);
+}
+
+.copy-command-btn.copied_failure {
+  color: var(--error);
+  background-color: var(--error-background);
 }
 
 .copy-command-btn i {
@@ -541,14 +693,20 @@ export default class ExtensionShow extends Vue {
 .copy-text {
   font-size: 0.8rem;
   font-weight: 600;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
   opacity: 0;
   transform: translateX(-10px);
   transition: all 0.3s ease;
 }
 
-.copy-command-btn.copied .copy-text {
+.copy-command-btn.copied .copy-text,
+.copy-command-btn.copied_failure .copy-text {
+  max-width: 100px;
   opacity: 1;
   transform: translateX(0);
+  margin-left: 4px;
 }
 
 .content-area {
@@ -563,6 +721,16 @@ export default class ExtensionShow extends Vue {
   display: flex;
   border-bottom: 1px solid var(--border);
   padding: 0 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tab {
@@ -570,25 +738,52 @@ export default class ExtensionShow extends Vue {
   cursor: pointer;
   font-weight: 500;
   position: relative;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.3s ease;
+  z-index: 1;
 }
 
 .tab.active {
   color: var(--primary);
 }
 
-.tab.active::after {
-  content: "";
+.tab-indicator {
   position: absolute;
-  bottom: -1px;
+  bottom: 0;
   left: 0;
-  width: 100%;
   height: 3px;
   background: var(--primary);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
 }
 
 .tab-content {
   padding: 30px;
   min-height: 400px;
+  position: relative;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .readme-content {
@@ -616,7 +811,7 @@ export default class ExtensionShow extends Vue {
 .no-content {
   text-align: center;
   padding: 50px 0;
-  color: #777;
+  color: var(--hint);
 }
 
 .license-content {
@@ -651,31 +846,61 @@ export default class ExtensionShow extends Vue {
 }
 
 .version-date {
-  color: #777;
+  color: var(--hint);
   font-size: 0.9rem;
+}
+
+.dep-section-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 @media (max-width: 768px) {
   .main-content {
     flex-direction: column;
+    padding: 15px 0;
   }
 
   .sidebar {
     flex: 1;
   }
 
-  .header-content {
-    flex-direction: column;
-    gap: 15px;
+  .tabs {
+    padding: 0 10px;
   }
 
-  .search-bar {
-    margin: 10px 0;
-    width: 100%;
+  .tab {
+    padding: 12px 15px;
+    font-size: 0.9rem;
   }
 
-  .nav-links {
-    margin-top: 10px;
+  .tab-content {
+    padding: 20px 15px;
+  }
+
+  .content-area {
+    border-radius: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 10px 0;
+  }
+
+  .tabs {
+    padding: 0 5px;
+  }
+
+  .tab {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .tab-content {
+    padding: 15px 10px;
   }
 }
 </style>

@@ -20,7 +20,7 @@ class Props {
 @Options({
   name: "ErrorContainer",
 })
-export default class ErrorContainer extends Vue.with(Props) {
+class ErrorContainer extends Vue.with(Props) {
   errorMessage: string = "";
 
   async init(): Promise<void> {
@@ -38,6 +38,8 @@ export default class ErrorContainer extends Vue.with(Props) {
     await this.init();
   }
 }
+
+export default ErrorContainer;
 </script>
 
 <style>
@@ -65,7 +67,7 @@ export default class ErrorContainer extends Vue.with(Props) {
 }
 
 .error-message {
-  color: #666;
+  color: var(--hint);
   font-size: 16px;
   margin: 0 0 24px 0;
   max-width: 400px;
@@ -74,7 +76,7 @@ export default class ErrorContainer extends Vue.with(Props) {
 
 .retry-button {
   background-color: var(--primary);
-  color: white;
+  color: var(--light);
   border: none;
   padding: 12px 24px;
   border-radius: 6px;

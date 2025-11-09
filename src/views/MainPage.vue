@@ -53,13 +53,13 @@ export default {
 .hero h1 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: #2c3e50;
+  color: var(--greet-message);
 }
 
 .hero p {
   font-size: 1.2rem;
   margin-bottom: 2rem;
-  color: #5a6a7a;
+  color: var(--secondary-greeting);
 }
 
 .hero-logo {
@@ -72,7 +72,7 @@ export default {
 
 .primary-button {
   background-color: var(--primary);
-  color: white;
+  color: var(--greet-title);
   border: none;
   padding: 12px 24px;
   border-radius: 4px;

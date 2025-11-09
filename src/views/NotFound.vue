@@ -8,12 +8,14 @@
             <i class="nf nf-fa-exclamation_triangle"></i>
           </div>
         </div>
-        
+
         <div class="errror-msg">
           <h1>Page Not Found</h1>
-          <p>Sorry, the page you're looking for doesn't exist or has been moved.</p>
+          <p>
+            Sorry, the page you're looking for doesn't exist or has been moved.
+          </p>
         </div>
-        
+
         <div class="error-actions">
           <button class="primary-button" @click="goHome">
             <i class="nf nf-cod-home"></i>
@@ -39,23 +41,25 @@ import { Options, Vue } from "vue-class-component";
 @Options({
   name: "NotFound",
 })
-export default class NotFound extends Vue {
+class NotFound extends Vue {
   goHome(): void {
-    this.$router.push('/');
+    this.$router.push("/");
   }
-  
+
   goBack(): void {
     if (window.history.length > 1) {
       this.$router.go(-1);
     } else {
-      this.$router.push('/');
+      this.$router.push("/");
     }
   }
-  
+
   goExtensions(): void {
-    this.$router.push('/extensions');
+    this.$router.push("/extensions");
   }
 }
+
+export default NotFound;
 </script>
 
 <style scoped>
@@ -67,7 +71,7 @@ export default class NotFound extends Vue {
   align-items: center;
   justify-content: center;
   padding: 2rem 0;
-  background: #f8f9fa;
+  background: var(--light-background);
 }
 
 .container {
@@ -79,10 +83,10 @@ export default class NotFound extends Vue {
 
 .error-content {
   text-align: center;
-  background: white;
+  background: var(--light);
   border-radius: 12px;
   padding: 3rem 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px var(--shadow);
 }
 
 .error-illustration {
@@ -97,7 +101,7 @@ export default class NotFound extends Vue {
   color: var(--primary);
   line-height: 1;
   margin-bottom: 1rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 2px 2px 4px var(--shadow);
   text-align: center;
 }
 
@@ -119,14 +123,14 @@ export default class NotFound extends Vue {
 
 .errror-msg h1 {
   font-size: 2.5rem;
-  color: #2c3e50;
+  color: var(--greet-message);
   margin-bottom: 1rem;
   width: 100%;
 }
 
 .errror-msg p {
   font-size: 1.1rem;
-  color: #666;
+  color: var(--hint);
   line-height: 1.6;
   margin-bottom: 0.5rem;
   width: 100%;
@@ -142,7 +146,8 @@ export default class NotFound extends Vue {
   margin-bottom: 3rem;
 }
 
-.primary-button, .secondary-button {
+.primary-button,
+.secondary-button {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -158,7 +163,7 @@ export default class NotFound extends Vue {
 
 .primary-button {
   background: var(--primary);
-  color: white;
+  color: var(--light);
 }
 
 .primary-button:hover {
@@ -169,12 +174,12 @@ export default class NotFound extends Vue {
 .secondary-button {
   background: transparent;
   color: var(--primary);
-  border: 2px solid var(--primary);
+  border: 2px solid var(--border);
 }
 
 .secondary-button:hover {
   background: var(--primary);
-  color: white;
+  color: var(--light);
   transform: translateY(-2px);
 }
 
@@ -182,21 +187,22 @@ export default class NotFound extends Vue {
   .error-content {
     padding: 2rem 1rem;
   }
-  
+
   .error-code {
     font-size: 6rem;
   }
-  
+
   .errror-msg h1 {
     font-size: 2rem;
   }
-  
+
   .error-actions {
     flex-direction: column;
     align-items: center;
   }
-  
-  .primary-button, .secondary-button {
+
+  .primary-button,
+  .secondary-button {
     width: 100%;
     max-width: 250px;
     justify-content: center;
@@ -207,11 +213,11 @@ export default class NotFound extends Vue {
   .error-code {
     font-size: 4rem;
   }
-  
+
   .errror-msg h1 {
     font-size: 1.5rem;
   }
-  
+
   .errror-msg p {
     font-size: 1rem;
   }
@@ -237,7 +243,11 @@ export default class NotFound extends Vue {
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
   40% {

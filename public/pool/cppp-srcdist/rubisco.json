@@ -1,34 +1,38 @@
 {
-  "name": "Source distrobution builder",
-  "description": "Rubisco source package builder.",
-  "icon": "https://avatars.githubusercontent.com/u/130828670",
-  "maintainers": [
-    {
-      "name": "The C++ Plus Project",
-      "avatar": "https://avatars.githubusercontent.com/u/130828670",
-      "homepage": "https://github.com/cppp-project"
-    },
-    {
-      "name": "ChenPi11",
-      "avatar": "https://avatars.githubusercontent.com/u/102936596",
-      "homepage": "https://github.com/ChenPi11"
-    }
-  ],
-  "versions": [
-    {
-      "version": "0.1.0",
-      "date": "2025-07-24"
-    }
-  ],
-  "license": "GPL 3.0 License",
-  "homepage": "https://github.com/cppp-project/rubisco",
-  "tags": ["rubisco", "tarball", "srcpkg"],
   "deps": [
     {
+      "marker": "",
       "name": "pygit2",
-      "version": ">= 1.18.0",
-      "url": "https://pypi.org/project/pygit2/"
+      "url": "https://pypi.org/project/pygit2",
+      "version": ">=1.18.1",
+      "section": "pypi"
     }
   ],
-  "latest-release": "https://github.com/cppp-project/rubisco/archive/refs/heads/main.zip"
+  "description": "Rubisco source package builder.",
+  "homepage": "https://github.com/cppp-project/rubisco",
+  "icon": null,
+  "latest-release": "",
+  "license": "GPL-3.0",
+  "maintainers": [
+    {
+      "avatar": "https://github.com/cppp-project.png",
+      "email": "cpppteam@email.cn",
+      "homepage": "https://github.com/cppp-project",
+      "name": "The C++ Plus Project"
+    },
+    {
+      "avatar": "https://github.com/ChenPi11.png",
+      "email": "wushengwuxi-msctinoulk@outlook.com",
+      "homepage": "https://github.com/ChenPi11",
+      "name": "ChenPi11"
+    }
+  ],
+  "name": "cppp-srcpkg",
+  "tags": [
+    "rubisco",
+    "tarball",
+    "srcpkg"
+  ],
+  "version": "0.1.0",
+  "versions": []
 }

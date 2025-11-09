@@ -18,7 +18,7 @@
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
+  border: 4px solid var(--border);
   border-top: 4px solid var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;

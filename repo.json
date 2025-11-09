@@ -4,5 +4,17 @@
   "description": "Rubisco Extension Repository is a collection of extensions for Rubisco.",
   "maintainer": "ChenPi11 <wushengwuxi-msctinoulk@outlook.com>",
   "license": "GPL-3.0",
-  "includes": ["hooks.json"]
+  "includes": ["hooks.json"],
+  "subpackages": {
+    "license-list-data": {
+      "path": "3rd-party/license-list-data",
+      "url": "spdx/license-list-data@github",
+      "branch": "main"
+    },
+    "choosealicense.com": {
+      "path": "3rd-party/choosealicense.com",
+      "url": "github/choosealicense.com@github",
+      "branch": "main"
+    }
+  }
 }

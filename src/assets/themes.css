@@ -1,0 +1,162 @@
+:root {
+    --window-background: #f9f9f9;
+    --primary: #cb3837;
+    --primary-text: #cb3837;
+    --primary-stress: #b32d2a;
+    --primary-background: #f2e1e1;
+
+    --secondary: #ddd;
+    --secondary-hover: #555;
+    --hint: #666;
+    --dark: #333;
+    --light: #fff;
+    --light-background: #f0f0f0;
+    --secondary-light: #f8f9fa;
+    --secondary-light-hover: #e9ecef;
+
+    --border: #eaeaea;
+    --border-hover: #d0d0d0;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --shadow-hover: rgba(0, 0, 0, 0.12);
+
+    --success: #28a745;
+    --success-background: #d4edda;
+    --error: #dc3545;
+    --error-background: #f8d7da;
+
+    --greet-message: #2c3e50;
+    --secondary-greeting: #5a6a7a;
+    --greet-title: #fff;
+}
+
+:root[data-theme="blue"],
+html[data-theme="blue"] {
+    --window-background: #f0f8ff;
+    --primary: #2196f3;
+    --primary-text: #2196f3;
+    --primary-stress: #1976d2;
+    --primary-background: #e3f2fd;
+
+    --secondary: #e1e8f5;
+    --secondary-hover: #cfe0ff;
+    --hint: #6b7a8a;
+    --dark: #243240;
+    --light: #ffffff;
+    --light-background: #f7fbff;
+    --secondary-light: #f3f6fb;
+    --secondary-light-hover: #e9f0ff;
+
+    --border: #e6eefb;
+    --border-hover: #cfe0ff;
+    --shadow: rgba(14, 36, 100, 0.06);
+    --shadow-hover: rgba(14, 36, 100, 0.1);
+
+    --success: #28a745;
+    --success-background: #e6f4ea;
+    --error: #dc3545;
+    --error-background: #fdecea;
+
+    --greet-message: #133255;
+    --secondary-greeting: #3b5575;
+    --greet-title: #fff;
+}
+
+:root[data-theme="green"],
+html[data-theme="green"] {
+    --window-background: #f6fff7;
+    --primary: #2f9e44;
+    --primary-text: #2f9e44;
+    --primary-stress: #23863a;
+    --primary-background: #e6f4ea;
+
+    --secondary: #e9f6ef;
+    --secondary-hover: #cfe8d6;
+    --hint: #5f6f5f;
+    --dark: #0f3b1a;
+    --light: #ffffff;
+    --light-background: #f8fff9;
+    --secondary-light: #f0f9f3;
+    --secondary-light-hover: #e6f3ea;
+
+    --border: #e2efe6;
+    --border-hover: #cfe8d6;
+    --shadow: rgba(14, 52, 22, 0.06);
+    --shadow-hover: rgba(14, 52, 22, 0.1);
+
+    --success: #2f9e44;
+    --success-background: #dff3de;
+    --error: #dc3545;
+    --error-background: #fdecea;
+
+    --greet-message: #103a1b;
+    --secondary-greeting: #356a4a;
+    --greet-title: #fff;
+}
+
+/* Dark blue theme. */
+:root[data-theme="dark-blue"],
+html[data-theme="dark-blue"] {
+    --window-background: #1e1e1e;
+    --light-background: #252526;
+
+    --primary: #007acc;
+    --primary-text: #ffffff;
+    --primary-stress: #005a9e;
+    --primary-background: rgba(0, 122, 204, 0.1);
+
+    --secondary: #333333;
+    --secondary-hover: #3c3c3c;
+    --secondary-light: #2a2d2e;
+    --secondary-light-hover: #3c3c3c;
+
+    --dark: #d4d4d4;
+    --light: #1e1e1e;
+    --hint: #808080;
+    --greet-message: #cccccc;
+    --secondary-greeting: #a0a0a0;
+    --greet-title: #ffffff;
+
+    --border: #3c3c3c;
+    --border-hover: #505050;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --shadow-hover: rgba(0, 0, 0, 0.4);
+
+    --success: #37a84e;
+    --success-background: rgba(55, 168, 78, 0.15);
+    --error: #f44747;
+    --error-background: rgba(244, 71, 71, 0.15);
+}
+
+/* Dark purple theme. */
+:root[data-theme="dark-purple"],
+html[data-theme="dark-purple"] {
+    --window-background: #1e1e1e;
+    --light-background: #252526;
+
+    --primary: #9F3DEB;
+    --primary-text: #ffffff;
+    --primary-stress: #ae5fea;
+    --primary-background: rgba(81, 45, 168, 0.1);
+
+    --secondary: #333333;
+    --secondary-hover: #3c3c3c;
+    --secondary-light: #2a2d2e;
+    --secondary-light-hover: #3c3c3c;
+
+    --dark: #d4d4d4;
+    --light: #1e1e1e;
+    --hint: #808080;
+    --greet-message: #cccccc;
+    --secondary-greeting: #a0a0a0;
+    --greet-title: #ffffff;
+
+    --border: #3c3c3c;
+    --border-hover: #505050;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --shadow-hover: rgba(0, 0, 0, 0.4);
+
+    --success: #37a84e;
+    --success-background: rgba(55, 168, 78, 0.15);
+    --error: #f44747;
+    --error-background: rgba(244, 71, 71, 0.15);
+}

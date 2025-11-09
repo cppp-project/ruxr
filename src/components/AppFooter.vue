@@ -21,7 +21,9 @@
       <div class="footer-section">
         <h3>Legal</h3>
         <ul class="footer-links">
-          <li><router-link to="/code-of-conduct">Code of Conduct</router-link></li>
+          <li>
+            <router-link to="/code-of-conduct">Code of Conduct</router-link>
+          </li>
         </ul>
       </div>
     </div>
@@ -38,19 +40,21 @@ import { Options, Vue } from "vue-class-component";
 @Options({
   name: "AppFooter",
 })
-export default class AppFooter extends Vue {
+class AppFooter extends Vue {
   props:
     | {
         msg: String;
       }
     | undefined;
 }
+
+export default AppFooter;
 </script>
 
 <style scoped>
 footer {
-  background: var(--dark);
-  color: white;
+  background: #333;
+  color: #fff;
   padding: 40px 0 20px;
   margin-top: 40px;
 }
@@ -81,13 +85,17 @@ footer {
   list-style-type: disc;
 }
 
-.footer-links a, .footer-links .router-link-active, .footer-links .router-link-exact-active {
+.footer-links a,
+.footer-links .router-link-active,
+.footer-links .router-link-exact-active {
   color: #ddd;
   text-decoration: none;
 }
 
-.footer-links a:hover, .footer-links .router-link-active:hover, .footer-links .router-link-exact-active:hover {
-  color: white;
+.footer-links a:hover,
+.footer-links .router-link-active:hover,
+.footer-links .router-link-exact-active:hover {
+  color: #fff;
   text-decoration: underline;
 }
 

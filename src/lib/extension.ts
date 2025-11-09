@@ -66,6 +66,7 @@ export type Dependence = {
     name: string;
     version: string;
     url: string;
+    section: string | null;
 }
 
 export class FullExtensionInfo {
@@ -99,17 +100,18 @@ export class FullExtensionInfo {
             name: d.name,
             version: d.version,
             url: d.url || "",
+            section: d.section || null,
         }));
         instance.latest_release = data["latest-release"];
         return instance;
     }
 
     getReadmeUrl(): string {
-        return `/ruxr/pool/${this.id}/README.md`;
+        return `/pool/${this.id}/README.md`;
     }
 
     getLicenseUrl(): string {
-        return `/ruxr/pool/${this.id}/LICENSE`;
+        return `/pool/${this.id}/LICENSE`;
     }
 }
 

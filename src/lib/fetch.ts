@@ -1,10 +1,10 @@
 import { ExtensionCard, FullExtensionInfo } from './extension';
 
-const EXTENSIONS_LIST_URL = '/ruxr/pool/Release.json'
-const EXTENSIONS_INFO_URL = '/ruxr/pool/{id}/rubisco.json'
+const EXTENSIONS_LIST_URL = '/pool/Release.json'
+const EXTENSIONS_INFO_URL = '/pool/{id}/rubisco.json'
 
-export async function fetchExtensions(): Promise<ExtensionCard[]> {
-    const response = await fetch(EXTENSIONS_LIST_URL);
+export async function fetchExtensions(baseUrl: string): Promise<ExtensionCard[]> {
+    const response = await fetch(baseUrl + EXTENSIONS_LIST_URL);
     const responseData = await response.json();
     const data = responseData["pool"];
     const res: ExtensionCard[] = [];
@@ -17,12 +17,15 @@ export async function fetchExtensions(): Promise<ExtensionCard[]> {
     return res;
 }
 
-export async function fetchExtensionInfo(id: string): Promise<FullExtensionInfo> {
-    const response = await fetch(EXTENSIONS_INFO_URL.replace("{id}", id));
+export async function fetchExtensionInfo(baseUrl: string, id: string): Promise<FullExtensionInfo | null> {
+
+    const response = await fetch(baseUrl + EXTENSIONS_INFO_URL.replace("{id}", id));
+    if (response.status === 404) {
+        return null;
+    }
     const responseData = await response.json();
     responseData.id = id;
     const extinfo = FullExtensionInfo.fromJSON(responseData);
     extinfo.id = id;
-    console.log(extinfo)
     return extinfo;
 }

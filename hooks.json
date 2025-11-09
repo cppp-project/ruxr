@@ -5,6 +5,9 @@
     },
     "build": {
       "exec": "npm run build"
+    },
+    "gen-licenses-data": {
+      "run": ".rubisco/gen-licenses-data.yml"
     }
   }
 }

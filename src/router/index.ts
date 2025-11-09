@@ -34,10 +34,17 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHashHistory(
-        process.env.NODE_ENV === "production" ? "/ruxr" : process.env.BASE_URL
-    ),
-    routes
+    history: createWebHashHistory(),
+    routes,
+    scrollBehavior(to, from, savedPosition) {
+        if (to.hash) {
+            return {
+                el: to.hash,
+                behavior: "smooth"
+            };
+        }
+        return { top: 0 };
+    }
 });
 
 export default router;

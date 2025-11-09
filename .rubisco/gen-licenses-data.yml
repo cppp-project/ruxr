@@ -1,0 +1,23 @@
+name: 📄 Generate licenses-data.
+
+steps:
+  - name: 📁 Create licenses-data directory.
+    mkdir: public/licenses-data
+
+  - name: 📄 Find licenses metadata files.
+    glob: "3rd-party/license-list-data/json/details/*.json"
+    save-to: licenses-meta-files
+
+  - name: 🛠️ Copy and trim JSON files.
+    matrix:
+      file: ${{ licenses-meta-files }}
+    steps:
+      - name: 🛠️ Build JSON file for ${{ file }}.
+        run:
+          [
+            "${{ python }}",
+            ".rubisco/licenses-meta.py",
+            "${{ file }}",
+            "3rd-party/license-list-data/html/$&{{ file.stem }}.html",
+            "public/licenses-data/$&{{ file.stem }}.json",
+          ]

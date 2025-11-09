@@ -59,6 +59,7 @@ import { ExtensionCard } from "@/lib/extension";
 
 import LoadingBar from "@/components/LoadingBar.vue";
 import ErrorContainer from "@/components/ErrorContainer.vue";
+// import NotFound from "./NotFound.vue";
 
 @Options({
   components: {
@@ -66,7 +67,7 @@ import ErrorContainer from "@/components/ErrorContainer.vue";
     ErrorContainer,
   },
 })
-export default class ExtensionList extends Vue {
+class ExtensionList extends Vue {
   $router!: Router;
 
   name: string = "ExtensionList";
@@ -95,7 +96,7 @@ export default class ExtensionList extends Vue {
   async initExtensionList(): Promise<void> {
     this.isLoading = true;
     try {
-      this.extensions = await fetchExtensions();
+      this.extensions = await fetchExtensions(process.env.BASE_URL);
       this.filterExtensions();
     } finally {
       this.isLoading = false;
@@ -135,6 +136,8 @@ export default class ExtensionList extends Vue {
     await this.initExtensionList();
   }
 }
+
+export default ExtensionList;
 </script>
 
 <style scoped>
@@ -147,11 +150,16 @@ export default class ExtensionList extends Vue {
 
 .container {
   width: 100%;
+  max-width: 100%;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 .extensions-container {
-  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
 }
 
 .extensions-grid {
@@ -159,25 +167,28 @@ export default class ExtensionList extends Vue {
   flex-direction: column;
   gap: 12px;
   width: 100%;
+  max-width: 100%;
 }
 
 .extension-card {
-  background: #fff;
+  background: var(--window-background);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--shadow);
   padding: 20px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
+  border: 1px solid var(--border);
   width: 100%;
-  border: 1px solid #e8e8e8;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .extension-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  border-color: #d0d0d0;
+  box-shadow: 0 4px 16px var(--shadow-hover);
+  border-color: var(--border-hover);
 }
 
 .extension-icon {
@@ -189,7 +200,7 @@ export default class ExtensionList extends Vue {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8f9fa;
+  background-color: var(--window-background);
   flex-shrink: 0;
 }
 
@@ -202,7 +213,7 @@ export default class ExtensionList extends Vue {
 .default-icon {
   font-size: 64px;
   font-weight: bold;
-  color: #666;
+  color: var(--hint);
 }
 
 .extension-details {
@@ -216,13 +227,13 @@ export default class ExtensionList extends Vue {
   margin: 0 0 8px 0;
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: var(--dark);
 }
 
 .description {
   margin: 0 0 12px 0;
   font-size: 14px;
-  color: #666;
+  color: var(--hint);
   line-height: 1.4;
 }
 
@@ -255,7 +266,7 @@ export default class ExtensionList extends Vue {
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
-  color: #888;
+  color: var(--hint);
   margin-top: auto;
 }
 
@@ -264,7 +275,7 @@ export default class ExtensionList extends Vue {
 }
 
 .version {
-  background-color: #f0f0f0;
+  background-color: var(--light-background);
   padding: 6px 12px;
   border-radius: 12px;
   font-size: 14px;
@@ -275,5 +286,53 @@ export default class ExtensionList extends Vue {
   text-align: center;
   padding: 40px 0;
   color: var(--dark);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 12px;
+  }
+
+  .extension-card {
+    padding: 16px;
+  }
+
+  .extension-icon {
+    width: 80px;
+    height: 80px;
+    margin-right: 12px;
+  }
+
+  .default-icon {
+    font-size: 40px;
+  }
+
+  .extension-details h3 {
+    font-size: 16px;
+  }
+
+  .description {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 8px;
+  }
+
+  .extension-card {
+    padding: 12px;
+  }
+
+  .extension-icon {
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
+  }
+
+  .default-icon {
+    font-size: 30px;
+  }
 }
 </style>
